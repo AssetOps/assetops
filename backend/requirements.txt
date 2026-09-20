@@ -1,0 +1,7 @@
+Django>=5.2,<6
+djangorestframework
+django-cors-headers
+psycopg[binary]
+pytest
+pytest-django
+ruff
