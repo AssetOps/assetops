@@ -23,15 +23,11 @@ export default function LoginPage() {
       >
         <div>
           <h1 className="text-2xl font-bold">Sign in</h1>
-          <p className="text-sm text-gray-500">
-            Sign in to AssetTop
-          </p>
+          <p className="text-sm text-gray-500">Sign in to AssetTop</p>
         </div>
 
         <div>
-          <label className="mb-1 block text-sm">
-            Email
-          </label>
+          <label className="mb-1 block text-sm">Email</label>
 
           <input
             type="email"
@@ -43,9 +39,7 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm">
-            Password
-          </label>
+          <label className="mb-1 block text-sm">Password</label>
 
           <input
             type="password"

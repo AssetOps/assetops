@@ -1,7 +1,7 @@
 const API_URL =
   typeof window === "undefined"
-    ? process.env.API_URL ?? "http://backend:8000/api"
-    : process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+    ? (process.env.API_URL ?? "http://backend:8000/api")
+    : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api");
 
 export type Product = {
   id: string;

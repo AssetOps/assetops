@@ -33,29 +33,16 @@ export default async function InventoryPage() {
 
           <tbody>
             {stockLevels.map((stock) => (
-              <tr
-                key={stock.id}
-                className="border-b"
-              >
-                <td className="p-4 font-medium">
-                  {stock.product_name}
-                </td>
+              <tr key={stock.id} className="border-b">
+                <td className="p-4 font-medium">{stock.product_name}</td>
 
-                <td className="p-4">
-                  {stock.product_sku}
-                </td>
+                <td className="p-4">{stock.product_sku}</td>
 
-                <td className="p-4">
-                  {stock.category_name}
-                </td>
+                <td className="p-4">{stock.category_name}</td>
 
-                <td className="p-4">
-                  {stock.location_name}
-                </td>
+                <td className="p-4">{stock.location_name}</td>
 
-                <td className="p-4">
-                  {stock.quantity_on_hand}
-                </td>
+                <td className="p-4">{stock.quantity_on_hand}</td>
               </tr>
             ))}
           </tbody>
