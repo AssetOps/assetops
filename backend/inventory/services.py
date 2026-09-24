@@ -1,68 +1,93 @@
+from decimal import Decimal
+
 from django.db import transaction
 
-from .models import InventoryItem, StockMovement
+from .models import Product, StockLevel, StockMovement
+
+
+def _get_stock_level(product: Product, location):
+    stock_level, _ = StockLevel.objects.get_or_create(
+        product=product,
+        location=location,
+        defaults={
+            "quantity_on_hand": Decimal(0),
+        },
+    )
+
+    return StockLevel.objects.select_for_update().get(
+        pk=stock_level.pk,
+    )
 
 
 @transaction.atomic
-def add_stock(item_id, quantity, note=""):
+def add_stock(product, location, quantity, reason=""):
+    quantity = Decimal(quantity)
+
     if quantity <= 0:
         raise ValueError("Quantity must be greater than 0.")
 
-    item = InventoryItem.objects.select_for_update().get(id=item_id)
+    stock_level = _get_stock_level(product, location)
 
-    item.quantity += quantity
-    item.save(update_fields=["quantity"])
+    stock_level.quantity_on_hand += quantity
+    stock_level.save()
 
-    StockMovement.objects.create(
-        item=item,
-        movement_type=StockMovement.MovementType.ADD,
+    movement = StockMovement.objects.create(
+        product=product,
+        location=location,
         quantity=quantity,
-        note=note,
+        reason=reason or "add",
     )
 
-    return item
+    return stock_level, movement
 
 
 @transaction.atomic
-def remove_stock(item_id, quantity, note=""):
+def remove_stock(product, location, quantity, reason=""):
+    quantity = Decimal(quantity)
+
     if quantity <= 0:
         raise ValueError("Quantity must be greater than 0.")
 
-    item = InventoryItem.objects.select_for_update().get(id=item_id)
+    stock_level = _get_stock_level(product, location)
 
-    if quantity > item.quantity:
-        raise ValueError("Not enough stock.")
+    if stock_level.quantity_on_hand < quantity:
+        raise ValueError("Not enough stock at this location.")
 
-    item.quantity -= quantity
-    item.save(update_fields=["quantity"])
+    stock_level.quantity_on_hand -= quantity
+    stock_level.save()
 
-    StockMovement.objects.create(
-        item=item,
-        movement_type=StockMovement.MovementType.REMOVE,
-        quantity=quantity,
-        note=note,
+    movement = StockMovement.objects.create(
+        product=product,
+        location=location,
+        quantity=-quantity,
+        reason=reason or "remove",
     )
 
-    return item
+    return stock_level, movement
 
 
 @transaction.atomic
-def adjust_stock(item_id, new_quantity, note=""):
+def adjust_stock(product, location, new_quantity, reason=""):
+    new_quantity = Decimal(new_quantity)
+
     if new_quantity < 0:
         raise ValueError("Quantity cannot be negative.")
 
-    item = InventoryItem.objects.select_for_update().get(id=item_id)
+    stock_level = _get_stock_level(product, location)
 
-    difference = abs(new_quantity - item.quantity)
+    difference = new_quantity - stock_level.quantity_on_hand
 
-    item.quantity = new_quantity
-    item.save(update_fields=["quantity"])
+    stock_level.quantity_on_hand = new_quantity
+    stock_level.save()
 
-    StockMovement.objects.create(
-        item=item,
-        movement_type=StockMovement.MovementType.ADJUST,
-        quantity=difference,
-        note=note,
-    )
+    movement = None
 
-    return item
+    if difference != 0:
+        movement = StockMovement.objects.create(
+            product=product,
+            location=location,
+            quantity=difference,
+            reason=reason or "adjust",
+        )
+
+    return stock_level, movement
