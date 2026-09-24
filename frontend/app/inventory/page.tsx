@@ -1,60 +1,71 @@
-type InventoryItem = {
-  id: string;
-  name: string;
-  serial_number: string;
-  quantity: number;
-  status: string;
-  notes: string;
-};
-
-async function getItems(): Promise<InventoryItem[]> {
-  const apiUrl =
-    process.env.API_URL ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    "http://backend:8000/api";
-
-  const response = await fetch(`${apiUrl}/items/`, {
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to load inventory");
-  }
-
-  return response.json();
-}
+import { getStockLevels } from "@/lib/api";
 
 export default async function InventoryPage() {
-  const items = await getItems();
+  const stockLevels = await getStockLevels();
 
   return (
     <main className="p-8">
-      <h1 className="mb-6 text-3xl font-bold">Inventory</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Inventory</h1>
 
-      <div className="overflow-hidden rounded-lg border">
+          <p className="text-gray-500">
+            Manage products and stock across locations.
+          </p>
+        </div>
+
+        <button className="rounded-lg bg-black px-4 py-2 text-white">
+          Add Product
+        </button>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border">
         <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left">Name</th>
-              <th className="p-4 text-left">Serial Number</th>
+          <thead className="border-b bg-gray-50">
+            <tr>
+              <th className="p-4 text-left">Product</th>
+              <th className="p-4 text-left">SKU</th>
+              <th className="p-4 text-left">Category</th>
+              <th className="p-4 text-left">Location</th>
               <th className="p-4 text-left">Quantity</th>
-              <th className="p-4 text-left">Status</th>
             </tr>
           </thead>
 
           <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-b">
-                <td className="p-4">{item.name}</td>
-                <td className="p-4">
-                  {item.serial_number || "Not set"}
+            {stockLevels.map((stock) => (
+              <tr
+                key={stock.id}
+                className="border-b"
+              >
+                <td className="p-4 font-medium">
+                  {stock.product_name}
                 </td>
-                <td className="p-4">{item.quantity}</td>
-                <td className="p-4 capitalize">{item.status}</td>
+
+                <td className="p-4">
+                  {stock.product_sku}
+                </td>
+
+                <td className="p-4">
+                  {stock.category_name}
+                </td>
+
+                <td className="p-4">
+                  {stock.location_name}
+                </td>
+
+                <td className="p-4">
+                  {stock.quantity_on_hand}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        {stockLevels.length === 0 && (
+          <div className="p-10 text-center text-gray-500">
+            No inventory yet.
+          </div>
+        )}
       </div>
     </main>
   );

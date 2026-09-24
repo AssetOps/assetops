@@ -40,6 +40,16 @@ class StockLevelSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    product_sku = serializers.CharField(
+        source="product.sku",
+        read_only=True,
+    )
+
+    category_name = serializers.CharField(
+        source="product.category.name",
+        read_only=True,
+    )
+
     location_name = serializers.CharField(
         source="location.name",
         read_only=True,
@@ -47,10 +57,13 @@ class StockLevelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StockLevel
+
         fields = (
             "id",
             "product",
             "product_name",
+            "product_sku",
+            "category_name",
             "location",
             "location_name",
             "quantity_on_hand",
@@ -62,7 +75,6 @@ class StockLevelSerializer(serializers.ModelSerializer):
             "quantity_on_hand",
             "last_updated",
         )
-
 
 class StockMovementSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(
