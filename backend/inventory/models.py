@@ -1,4 +1,5 @@
 import uuid
+from typing import ClassVar
 
 from django.db import models
 
@@ -51,7 +52,7 @@ class StockLevel(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        constraints = [
+        constraints: ClassVar[list] = [
             models.UniqueConstraint(
                 fields=["product", "location"], name="unique_stock_per_location"
             )
@@ -86,11 +87,17 @@ class StockMovement(models.Model):
         Location, on_delete=models.PROTECT, related_name="movements"
     )
     reception = models.ForeignKey(
-        Reception, on_delete=models.SET_NULL, null=True, blank=True,
+        Reception,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="movements",
     )
     sale = models.ForeignKey(
-        Sale, on_delete=models.SET_NULL, null=True, blank=True,
+        Sale,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="movements",
     )
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
