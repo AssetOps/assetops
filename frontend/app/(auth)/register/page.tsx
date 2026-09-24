@@ -9,7 +9,10 @@ export default function RegisterPage() {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    console.log({ email, password });
+    console.log({
+      emailProvided: email.length > 0,
+      passwordProvided: password.length > 0,
+    });
   }
 
   return (
