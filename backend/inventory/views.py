@@ -107,11 +107,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         response = {
             "stock_level": StockLevelSerializer(stock_level).data,
-            "movement": (
-                StockMovementSerializer(movement).data
-                if movement
-                else None
-            ),
+            "movement": (StockMovementSerializer(movement).data if movement else None),
         }
 
         return Response(

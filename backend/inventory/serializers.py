@@ -76,6 +76,7 @@ class StockLevelSerializer(serializers.ModelSerializer):
             "last_updated",
         )
 
+
 class StockMovementSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(
         source="product.name",
