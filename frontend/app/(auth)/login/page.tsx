@@ -9,10 +9,7 @@ export default function LoginPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    console.log({
-      email,
-      password,
-    });
+    console.log("Login form submitted");
   }
 
   return (
